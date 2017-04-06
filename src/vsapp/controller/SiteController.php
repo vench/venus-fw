@@ -1,10 +1,10 @@
 <?php
 
-namespace app\controller;
+namespace vsapp\controller;
 
-use app\ApplyAppableInterface;
-use app\AppContextInterface;
-use app\util\View;
+use vsapp\ApplyAppableInterface;
+use vsapp\AppContextInterface;
+use vsapp\util\View;
 
 /**
  * Description of HomeController

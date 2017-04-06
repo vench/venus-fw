@@ -1,9 +1,8 @@
 <?php
 
  
-namespace app;
-
-use \app\ApplyAppableInterface;
+namespace vsapp;
+ 
 
 /**
  * Description of AppConfig
@@ -17,12 +16,18 @@ class AppConfig implements ApplyAppableInterface {
      * @var array 
      */
     private $config = [
-        'defaultPage' => 'page',
+        'defaultPage' => 'site',
     ];
     
-    
-    
-    
+    /**
+     *
+     * @var string 
+     */
+    private $resourcePath;
+
+
+
+
     /**
      * 
      * @param string $name
@@ -38,15 +43,25 @@ class AppConfig implements ApplyAppableInterface {
      * @return array
      */
     public function getControllerPaths() {
-        return array_merge( $this->getValue('controllerPaths', []), ['app\controller']);
+        return array_merge( $this->getValue('controllerPaths', []), [ __NAMESPACE__ . '\controller']);
     }
+    
+    /**
+     * 
+     * @return string
+     */
+    public function getResourcePath() {
+        return $this->resourcePath;
+    }
+    
 
     /**
      * 
-     * @param \app\AppContextInterface $app
+     * @param \vsapp\AppContextInterface $app
      */
-    public function appInit(AppContextInterface $app) {
-       $path = self::getPath(); 
+    public function appInit(AppContextInterface $app) { var_dump( $app->get('resource')); exit();
+       $this->resourcePath = $app->get('resource')->getPath();
+       $path = $this->getResourcePath() . '/config';
        $scan = scandir( $path );
        foreach($scan as $file) {
            if($file == '.' || $file == '..') {
@@ -58,13 +73,6 @@ class AppConfig implements ApplyAppableInterface {
     }
     
     
-    /**
-     * 
-     * @return string
-     * @todo ТОже надо тянуть через конфиг
-     */
-    public static function getPath() {
-        return dirname(__FILE__) . '/../resource/config';
-    }
+     
 
 }

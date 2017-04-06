@@ -2,7 +2,7 @@
 
 
 
-namespace app\util;
+namespace vsapp\util;
 
 /**
  * Description of Connection

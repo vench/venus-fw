@@ -1,6 +1,7 @@
 <?php
 
  
+namespace vsapp;
 
 /**
  * Description of AutoLoad
@@ -12,7 +13,7 @@ class AutoLoad {
      * 
      */
     public static  function init() {
-        $baseDir = dirname(__FILE__);
+        $baseDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . '..';
         spl_autoload_register(function ($class) use(&$baseDir) {
             if(class_exists($class, false)) {
                 return;

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\util;
+namespace vsapp\util;
 
 /**
  * Description of View
@@ -45,7 +45,10 @@ class View {
      * @todo ТОже надо тянуть через конфиг
      */
     public static function getPathView() {
-        return dirname(__FILE__) . '/../../resource/views';
+        
+        $config = self::getConfig();
+        $pathView = $config->getResourcePath();
+        return $pathView . '/views';
     }
 
     /**
@@ -109,8 +112,8 @@ class View {
      * @return array
      */
     public static function getHelperFunstions() {
-        $app = \app\App::current();
-        $config = $app->get('\app\AppConfig');
+       
+        $config = self::getConfig();
                 
         return [
 
@@ -132,6 +135,15 @@ class View {
                 return $config->getValue('isLocal', false); 
             },         
         ];
+    }
+    
+    /**
+     * 
+     * @return \vsapp\AppConfig
+     */
+    private static function getConfig() {
+        $app = \vsapp\App::current();
+        return $app->get('\vsapp\AppConfig');
     }
 
 }

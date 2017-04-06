@@ -1,10 +1,10 @@
 <?php
 
 
-namespace app;
+namespace vsapp;
 
-use app\ApplyAppableInterface;
-use app\AppContextInterface;
+use vsapp\ApplyAppableInterface;
+use vsapp\AppContextInterface;
 
 /**
  * Description of Request
@@ -86,7 +86,7 @@ class Request implements ApplyAppableInterface {
      */
     public function appInit(AppContextInterface $app) {
         /* @var $appConfig \app\AppConfig */
-        $appConfig = $app->get('app\AppConfig'); 
+        $appConfig = $app->get( __NAMESPACE__ . '\AppConfig'); 
         $this->defaultPage = $appConfig->getValue('defaultPage');
     }
 

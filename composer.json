@@ -1,0 +1,20 @@
+{
+    "name": "vench/venus-fw",
+    "description": "Simple framework PHP",
+    "keywords": ["Simple framework"], 
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vench-master",
+            "email": "nowwrit@mail.ru",
+            "homepage": "http://vench-master.spb.ru",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0" 
+    }, 
+    "autoload": {
+    	"files": ["autoload.php"]
+    }
+}

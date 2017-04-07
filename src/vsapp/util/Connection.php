@@ -22,7 +22,7 @@ class Connection {
         static $conn = null;
         if(is_null($conn)) {
             $app = \app\App::current();
-            $config = $app->get('\app\AppConfig');
+            $config = $app->get('config');
             $db = $config->getValue('db'); 
             
             $dsn = isset($db['dsn']) ? $db['dsn'] : 'mysql:dbname=testdb;host=127.0.0.1';

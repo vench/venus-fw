@@ -143,7 +143,7 @@ class View {
      */
     private static function getConfig() {
         $app = \vsapp\App::current();
-        return $app->get('\vsapp\AppConfig');
+        return $app->get('config');
     }
 
 }

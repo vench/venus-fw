@@ -86,7 +86,7 @@ class Request implements ApplyAppableInterface {
      */
     public function appInit(AppContextInterface $app) {
         /* @var $appConfig \app\AppConfig */
-        $appConfig = $app->get( __NAMESPACE__ . '\AppConfig'); 
+        $appConfig = $app->get('config'); 
         $this->defaultPage = $appConfig->getValue('defaultPage');
     }
 

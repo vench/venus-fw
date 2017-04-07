@@ -35,6 +35,7 @@ class App implements AppContextInterface {
      */
     private $mapClassNameAliases = [
         'resource'  => __NAMESPACE__ . '\Resource',
+        'config'    => __NAMESPACE__ . '\AppConfig',
     ];
 
 
@@ -59,7 +60,7 @@ class App implements AppContextInterface {
      */ 
     private function runRequest() { 
         $request = $this->get(__NAMESPACE__ . '\Request');
-        $config = $this->get(__NAMESPACE__ . '\AppConfig');
+        $config = $this->get('config');
         
         $action = $request->getAction();
         $path = explode('/', $action); 

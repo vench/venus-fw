@@ -59,7 +59,7 @@ class AppConfig implements ApplyAppableInterface {
      * 
      * @param \vsapp\AppContextInterface $app
      */
-    public function appInit(AppContextInterface $app) { var_dump( $app->get('resource')); exit();
+    public function appInit(AppContextInterface $app) {
        $this->resourcePath = $app->get('resource')->getPath();
        $path = $this->getResourcePath() . '/config';
        $scan = scandir( $path );

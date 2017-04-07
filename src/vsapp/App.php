@@ -1,6 +1,6 @@
 <?php
 
-namespace app;
+namespace vsapp;
 
 /**
  * Description of App
@@ -15,6 +15,8 @@ class App implements AppContextInterface {
      */
     private static $inst = null;
     
+    
+    
     /**
      *
      * @var array 
@@ -26,6 +28,17 @@ class App implements AppContextInterface {
      * @var array 
      */
     private $reflections = [];
+    
+    /**
+     *
+     * @var array 
+     */
+    private $mapClassNameAliases = [
+        'resource'  => __NAMESPACE__ . '\Resource',
+        'config'    => __NAMESPACE__ . '\AppConfig',
+    ];
+
+
 
     /**
      * 
@@ -36,30 +49,25 @@ class App implements AppContextInterface {
     /**
      * 
      */
-    private function run() { 
+    public function run() { 
         $this->runRequest();  
     }
 
     
     /**
      * 
-     * @throws \Exception
-     * @todo add directory app\controller
+     * @throws \Exception 
      */ 
     private function runRequest() { 
-        $request = $this->get('app\Request');
-        $condif = $this->get('app\AppConfig');
+        $request = $this->get(__NAMESPACE__ . '\Request');
+        $config = $this->get('config');
         
         $action = $request->getAction();
-        $path = explode('/', $action);
-        
-        
-        
-        
+        $path = explode('/', $action); 
         
         $controllerName = isset($path[0]) ? 
-                'app\controller\\' .ucfirst($path[0]).'Controller' : 'app\controller\HomeController';
-        foreach ($condif->getControllerPaths() as $pathController) {
+                __NAMESPACE__ . '\controller\\' .ucfirst($path[0]).'Controller' :  __NAMESPACE__ . '\controller\SiteController';
+        foreach ($config->getControllerPaths() as $pathController) {
             $pathController = rtrim($pathController, '\\') . '\\' .ucfirst($path[0]).'Controller';
             if(class_exists($pathController )) {
                 $controllerName = $pathController;
@@ -105,15 +113,17 @@ class App implements AppContextInterface {
     
     /**
      * 
-     * @param type $name
-     * @param type $newInstance
-     * @return type
+     * @param string $className
+     * @param boolean $newInstance
+     * @return mixed
      */
-    public function get($name, $newInstance = false) {
+    public function get($className, $newInstance = false) {
+        $name = $this->getClassNameAliases($className);
+    
         if(!isset($this->context[$name]) || $newInstance) {
             $ref = $this->getReflection($name);
             $inst = $ref->newInstanceArgs(); 
-            if($ref->implementsInterface('app\ApplyAppableInterface')) {
+            if($ref->implementsInterface( __NAMESPACE__ . '\ApplyAppableInterface')) {
                 call_user_func_array([$inst, 'appInit'], [$this]);
             }
             $this->context[$name] = $inst;
@@ -121,8 +131,33 @@ class App implements AppContextInterface {
         return $this->context[$name];
     }
 
+    /**
+     * 
+     * @param string $aliases
+     * @param string $className
+     */
+     public function setClassNameAliases($aliases, $className) {
+         $this->mapClassNameAliases[$aliases] = $className;
+     }
 
-
+    
+    /**
+     * 
+     * @return \vsapp\IResource
+     */
+    public function getResource() {   
+        return $this->get('resource');
+    }
+    
+    /**
+     * 
+     * @param string $className
+     * @return string
+     */
+    private function getClassNameAliases($className) {         
+        return isset($this->mapClassNameAliases[$className]) ? 
+            $this->mapClassNameAliases[$className]: $className; 
+    }
 
 
     /**

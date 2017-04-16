@@ -12,15 +12,11 @@ class Trunk {
   
     const TYPE_ALL = -1;
     
-    const TYPE_INFO = 1;
+    const TYPE_INFO = 1; 
     
-    const TYPE_NOTICE = 2;
+    const TYPE_LOG = 2;
     
-    const TYPE_IMPORTANT = 4;
-    
-    const TYPE_TOP = 8;
-    
-    const TYPE_LOG = 16;
+    const TYPE_INIT_OBJECT = 4;
     
     
     
@@ -48,10 +44,27 @@ class Trunk {
         }
         return self::$instance;
     }
+    
+    /**
+     * 
+     * @param \vsapp\IObserver|\Closure $observer
+     * @param int $type
+     * @see addObserver()
+     */
+    public static function obs($observer, $type = 1) {
+        self::getInstance()->addObserver($observer, $type);
+    }
+    
+    
+    public static function f(Event $event) {
+        self::getInstance()->fire($event);
+    }
+    
 
     /**
      * 
-     * @param type $observer
+     * @param \vsapp\IObserver|\Closure $observer
+     * @param int $type
      */
     public function addObserver($observer, $type = 1) {
         if(!isset($this->observers[$type])) {
@@ -60,7 +73,11 @@ class Trunk {
         $this->observers[$type][] = $observer;
     }
     
-    public function fire($event) {
+    /**
+     * 
+     * @param \vsapp\Event $event
+     */
+    public function fire(Event $event) {
         
         $types = array_keys($this->observers);
         foreach($types as $type) {
@@ -68,6 +85,8 @@ class Trunk {
                 foreach($this->observers[$type] as $observer) {
                     if($observer instanceof \Closure) {
                         call_user_func_array($observer, [$event]);
+                    } else if($observer instanceof IObserver) {
+                        $observer->fire($event);
                     }
                 }
             }

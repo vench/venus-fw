@@ -36,6 +36,7 @@ class App implements AppContextInterface {
     private $mapClassNameAliases = [
         'resource'  => __NAMESPACE__ . '\Resource',
         'config'    => __NAMESPACE__ . '\AppConfig',
+        'log'       => __NAMESPACE__ . '\log\Log'    
     ];
 
 
@@ -45,7 +46,7 @@ class App implements AppContextInterface {
      */
     private function __construct() { }
 
-     
+    
     /**
      * 
      */
@@ -122,7 +123,8 @@ class App implements AppContextInterface {
     
         if(!isset($this->context[$name]) || $newInstance) {
             $ref = $this->getReflection($name);
-            $inst = $ref->newInstanceArgs(); 
+            $inst = $ref->newInstanceArgs();             
+            Trunk::f(new Event(Trunk::TYPE_INIT_OBJECT, $inst));
             if($ref->implementsInterface( __NAMESPACE__ . '\ApplyAppableInterface')) {
                 call_user_func_array([$inst, 'appInit'], [$this]);
             }

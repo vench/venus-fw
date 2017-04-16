@@ -7,8 +7,8 @@ require_once dirname(__FILE__) . '/../src/vsapp/AutoLoad.php';
 
 class R implements vsapp\IResource {
     public function getPath() {
-        echo __FILE__;
-        return 'r';
+         
+        return dirname(__FILE__) . '/../src/resource';
     }
 
 }
@@ -19,3 +19,4 @@ $app->setClassNameAliases('resource', 'R');
 
 $app->run();
 
+$app->get('log')->addMessage("Start");

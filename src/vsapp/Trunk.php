@@ -55,7 +55,10 @@ class Trunk {
         self::getInstance()->addObserver($observer, $type);
     }
     
-    
+    /**
+     * 
+     * @param \vsapp\Event $event
+     */
     public static function f(Event $event) {
         self::getInstance()->fire($event);
     }

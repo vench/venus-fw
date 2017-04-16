@@ -31,7 +31,7 @@ class LogFile implements \vsapp\IObserver {
         }
         
         $filename = 'test.log';
-        $handle = fopen($filename, 'w+');
+        $handle = fopen($filename, 'a+');
         fwrite($handle, $message);
         fclose($handle);
     }

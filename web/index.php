@@ -3,6 +3,7 @@
 require_once dirname(__FILE__) . '/../src/vsapp/AutoLoad.php'; 
 
 
+\vsapp\AutoLoad::addDirectory(  dirname(__FILE__) . '/../src/' );
 \vsapp\AutoLoad::init();
 
 class R implements vsapp\IResource {
@@ -20,3 +21,6 @@ $app->setClassNameAliases('resource', 'R');
 $app->run();
 
 $app->get('log')->addMessage("Start");
+
+$m = $app->get('\test_\Model');
+var_dump($m);

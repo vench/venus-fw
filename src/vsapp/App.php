@@ -9,42 +9,20 @@ namespace vsapp;
  */
 class App implements AppContextInterface {
     
-    /**
-     *
-     * @var App 
-     */
-    private static $inst = null;
     
-    
-    
-    /**
-     *
-     * @var array 
-     */
-    private $context = [];
-    
-    /**
-     *
-     * @var array 
-     */
-    private $reflections = [];
-    
-    /**
-     *
-     * @var array 
-     */
-    private $mapClassNameAliases = [
-        'resource'  => __NAMESPACE__ . '\Resource',
-        'config'    => __NAMESPACE__ . '\AppConfig',
-        'log'       => __NAMESPACE__ . '\log\Log'    
-    ];
 
-
+    
+    /**
+     *
+     * @var \vsapp\Vendor 
+     */
+    private $vendor;
+    
 
     /**
      * 
      */
-    private function __construct() { }
+    public function __construct() { }
 
     
     /**
@@ -78,7 +56,7 @@ class App implements AppContextInterface {
         
         $method = isset($path[1]) ? 'action'.ucfirst($path[1]) : 'actionIndex'; 
       
-        $ref = $this->getReflection($controllerName); 
+        $ref = $this->getVendor()->getReflection($controllerName); 
         if(!$ref->hasMethod($method)) {
             throw new \Exception("Action [$method] not found!");
         }
@@ -94,53 +72,7 @@ class App implements AppContextInterface {
         call_user_func_array([$controller, $method], $params);
     }
     
-    /**
-     * 
-     * @param string $className
-     * @return \ReflectionClass
-     * @throws Exception
-     */
-    private function getReflection($className) {
-        if(!class_exists($className)) {
-            throw new \Exception("Class {$className} not found");
-        }
-        if(!isset($this->reflections[$className])) {
-            $this->reflections[$className] = new \ReflectionClass($className);
-        }
-        return $this->reflections[$className];
-    }
     
-
-    
-    /**
-     * 
-     * @param string $className
-     * @param boolean $newInstance
-     * @return mixed
-     */
-    public function get($className, $newInstance = false) {
-        $name = $this->getClassNameAliases($className);
-    
-        if(!isset($this->context[$name]) || $newInstance) {
-            $ref = $this->getReflection($name);
-            $inst = $ref->newInstanceArgs();             
-            Trunk::f(new Event(Trunk::TYPE_INIT_OBJECT, $inst));
-            if($ref->implementsInterface( __NAMESPACE__ . '\ApplyAppableInterface')) {
-                call_user_func_array([$inst, 'appInit'], [$this]);
-            }
-            $this->context[$name] = $inst;
-        }
-        return $this->context[$name];
-    }
-
-    /**
-     * 
-     * @param string $aliases
-     * @param string $className
-     */
-     public function setClassNameAliases($aliases, $className) {
-         $this->mapClassNameAliases[$aliases] = $className;
-     }
 
     
     /**
@@ -151,15 +83,7 @@ class App implements AppContextInterface {
         return $this->get('resource');
     }
     
-    /**
-     * 
-     * @param string $className
-     * @return string
-     */
-    private function getClassNameAliases($className) {         
-        return isset($this->mapClassNameAliases[$className]) ? 
-            $this->mapClassNameAliases[$className]: $className; 
-    }
+
 
 
     /**
@@ -176,12 +100,39 @@ class App implements AppContextInterface {
      * 
      * @return App
      */
-    public static function current() {
-        if(is_null(self::$inst)) {
-            self::$inst = new self(); 
-        } 
-        return self::$inst;
+    public static function current() { 
+        return Vendor::getInstance()->get(__NAMESPACE__ . '\App');
+    }
+
+    /**
+     * 
+     * @param string $name class name or alias
+     * @param boolean $newInstance
+     * @return mixed
+     */
+    public function get($name, $newInstance = false) {
+        return $this->getVendor()->get($name, $newInstance);
+    }
+
+    /**
+     * 
+     * @param type $aliases
+     * @param type $className
+     */
+    public function setClassNameAliases($aliases, $className) {
+        $this->getVendor()->setClassNameAliases($aliases, $className);
     }
     
 
+
+    /**
+     * 
+     * @return \vsapp\Vendor
+     */
+    public function getVendor() {
+        if(is_null($this->vendor)) {
+            $this->vendor = Vendor::getInstance();
+        }
+        return $this->vendor; 
+    }
 }

@@ -25,7 +25,7 @@ class Request implements ApplyAppableInterface {
 
 
     /**
-     * 
+     * Get value from GET params
      * @param string $name
      * @return mixed
      */
@@ -34,7 +34,7 @@ class Request implements ApplyAppableInterface {
     }
     
     /**
-     * 
+     * Get value from POST params
      * @param string $name
      * @return mixed
      */
@@ -48,7 +48,19 @@ class Request implements ApplyAppableInterface {
      */
     public function getAction() { 
         $action = $this->get(self::ACTION_NAME);
+        if(empty($action) && !empty($path = $this->server('PATH_INFO'))) {
+            $action = $path;
+        } 
         return !is_null($action) ? $action : $this->getDefaultAction(); 
+    }
+    
+    /**
+     * 
+     * @param type $name
+     * @return type
+     */
+    public function server($name) {
+        return filter_input(INPUT_SERVER, $name);
     }
     
     /**

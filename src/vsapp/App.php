@@ -42,8 +42,8 @@ class App implements AppContextInterface {
         $config = $this->get('config');
         
         $action = $request->getAction();
-        $path = explode('/', $action); 
-        
+        $path = explode('/', ltrim($action, '/')); 
+         
         $controllerName = isset($path[0]) ? 
                 __NAMESPACE__ . '\controller\\' .ucfirst($path[0]).'Controller' :  __NAMESPACE__ . '\controller\SiteController';
         foreach ($config->getControllerPaths() as $pathController) {

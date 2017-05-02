@@ -17,6 +17,8 @@ class ProxyAnnotation implements ProxyAnnotationInterface {
     
     const PROXY_BEFORE = 2;
     
+    const PROXY_EXCEPTION = 3;
+    
  
     /**
      *
@@ -51,12 +53,38 @@ class ProxyAnnotation implements ProxyAnnotationInterface {
     public function __call($name, $arguments) {
         if(method_exists($this->object, $name)) { 
             $this->execBefore($name, $arguments);
-            $result = call_user_func_array([$this->object, $name], $arguments);
+            
+            try {
+                $result = call_user_func_array([$this->object, $name], $arguments);
+            } catch (\Exception $e) {
+                $this->execException($name, $e);
+            }    
+            
             $this->execAfter($name, $result);
             return $result; 
         }
         throw new \Exception("Method {$name} not found");
     }
+    
+    /**
+     * 
+     * @param type $name
+     * @param \Exception $e
+     * @return type
+     */
+    private function execException($name, \Exception $e) {
+        if(!isset($this->executionMap[$name])) {
+            return;
+        }
+        foreach($this->executionMap[$name] as $execution) {
+            if(is_callable($execution)) {
+                $execution($this->object, self::PROXY_EXCEPTION, $name, $e);
+            } else if($execution instanceof ProxyAnnotationFilterInterface) {
+                $execution->execException($this->object, $name, $e);
+            }
+        }
+    }
+    
     
     /**
      * 

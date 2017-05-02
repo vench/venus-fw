@@ -19,4 +19,8 @@ class NameClassEcho implements \vsapp\ProxyAnnotationFilterInterface {
         echo __METHOD__, '::', get_class($object), '<br>';
     }
 
+    public function execException($object, $name, $exception) {
+        
+    }
+
 }

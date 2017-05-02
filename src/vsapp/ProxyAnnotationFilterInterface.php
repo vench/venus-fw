@@ -24,4 +24,11 @@ interface ProxyAnnotationFilterInterface {
      * @param array $result
      */
     function execAfter($object, $name, $result);
+    
+    /**  
+     * @param object $object
+     * @param string $name
+     * @param \Exception $exception
+     */
+    function execException($object, $name, $exception);
 }

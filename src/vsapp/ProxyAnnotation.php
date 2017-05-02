@@ -11,7 +11,7 @@ namespace vsapp;
 class ProxyAnnotation implements ProxyAnnotationInterface {
     
     
-    const PROXY_EXEC = '\@proxy_exec';
+    const PROXY_EXEC = '@proxy_exec';
      
     const PROXY_AFTER = 1; 
     
@@ -70,9 +70,9 @@ class ProxyAnnotation implements ProxyAnnotationInterface {
         }
         foreach($this->executionMap[$name] as $execution) {
             if(is_callable($execution)) {
-                $execution($this->object, self::PROXY_BEFORE, $arguments);
+                $execution($this->object, self::PROXY_BEFORE, $name, $arguments);
             } else if($execution instanceof ProxyAnnotationFilterInterface) {
-                $execution->execBefore($this->object, $arguments);
+                $execution->execBefore($this->object, $name, $arguments);
             }
         }
     }
@@ -88,9 +88,9 @@ class ProxyAnnotation implements ProxyAnnotationInterface {
         }
         foreach($this->executionMap[$name] as $execution) {
             if(is_callable($execution)) {
-                $execution($this->object, self::PROXY_AFTER, $result);
+                $execution($this->object, self::PROXY_AFTER, $name, $result);
             } else if($execution instanceof ProxyAnnotationFilterInterface) {
-                $execution->execAfter($this->object, $result);
+                $execution->execAfter($this->object, $name, $result);
             }
         }
     }
@@ -110,7 +110,7 @@ class ProxyAnnotation implements ProxyAnnotationInterface {
         foreach($ref->getMethods( \ReflectionMethod::IS_PUBLIC ) as $method) {
             /* @var $method \ReflectionMethod */
             $doc = $method->getDocComment(); 
-            if(!empty($doc) && preg_match_all('/\*\s+@proxy_exec\s+(\S+)\s/i', $doc, $maths) && isset($maths[1])) {
+            if(!empty($doc) && preg_match_all('/\*\s+'.self::PROXY_EXEC.'\s+(\S+)\s/i', $doc, $maths) && isset($maths[1])) {
                 foreach($maths[1] as $classname) {
                     if(!isset($executionMap[$method->getShortName()])) {
                         $executionMap[$method->getShortName()] = [];

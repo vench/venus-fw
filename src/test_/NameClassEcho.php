@@ -11,11 +11,11 @@ namespace test_;
  */
 class NameClassEcho implements \vsapp\ProxyAnnotationFilterInterface {
 
-    public function execAfter($object, $result) {
+    public function execAfter($object, $name, $result) {
         echo __METHOD__, '::', get_class($object), '<br>';
     }
 
-    public function execBefore($object, $arguments) {
+    public function execBefore($object, $name, $arguments) {
         echo __METHOD__, '::', get_class($object), '<br>';
     }
 

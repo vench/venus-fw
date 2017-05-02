@@ -16,11 +16,11 @@ class TimeExec {
 
 
 
-    public function __invoke($object, $type, $result = null) {
+    public function __invoke($object, $type, $name, $result = null) {
         $time = microtime(true);
         echo "<br>", $type, " ", $time, "<br>";
         if($type == 1) {
-            echo ($time - $this->lastExecTime), "<br>";
+            echo $name, " ", ($time - $this->lastExecTime), "<br>";
         } else {
             $this->lastExecTime = $time;
         }

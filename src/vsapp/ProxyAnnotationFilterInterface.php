@@ -9,7 +9,19 @@ namespace vsapp;
  */
 interface ProxyAnnotationFilterInterface {
 
-    function execBefore($object, $arguments);
+    /**
+     * 
+     * @param object $object
+     * @param string $name
+     * @param array $arguments
+     */
+    function execBefore($object, $name, $arguments);
     
-    function execAfter($object, $result);
+    /**
+     * 
+     * @param object $object
+     * @param string $name
+     * @param array $result
+     */
+    function execAfter($object, $name, $result);
 }

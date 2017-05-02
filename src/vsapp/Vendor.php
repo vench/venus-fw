@@ -77,6 +77,9 @@ class Vendor implements AppContextInterface {
                     $inst->{$fieldName} = $this->get($className);
                 }
             }
+            if ($ref->implementsInterface(__NAMESPACE__ . '\ProxyAnnotationInterface')) {
+                $inst = ProxyAnnotation::createProxy($inst, $this); 
+            }
             
             $this->context[$name] = $inst;
         }

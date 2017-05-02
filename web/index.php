@@ -23,4 +23,4 @@ $app->run();
 $app->get('log')->addMessage("Start");
 
 $m = $app->get('\test_\Model');
-var_dump($m);
+$m->printName();

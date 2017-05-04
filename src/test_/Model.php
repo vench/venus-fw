@@ -8,7 +8,7 @@ namespace test_;
  *
  * @author vench
  */
-class Model implements \vsapp\BindingInterface, \vsapp\ProxyAnnotationInterface {
+class Model implements \vsapp\BindingInterface, \vsapp\proxy\AnnotationInterface {
 
     public $app;
 

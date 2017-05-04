@@ -9,7 +9,7 @@ namespace test_;
  *
  * @author vench
  */
-class NameClassEcho implements \vsapp\ProxyAnnotationFilterInterface {
+class NameClassEcho implements \vsapp\proxy\AnnotationFilterInterface {
 
     public function execAfter($object, $name, $result) {
         echo __METHOD__, '::', get_class($object), '<br>';

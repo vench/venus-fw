@@ -5,25 +5,33 @@ namespace vsapp\controller;
 use vsapp\ApplyAppableInterface;
 use vsapp\AppContextInterface;
 use vsapp\util\View;
-
+use vsapp\proxy\AnnotationInterface;
+ 
 /**
  * Description of HomeController
  *
  * @author vench
  */
-class SiteController implements ApplyAppableInterface {
+class SiteController implements ApplyAppableInterface, AnnotationInterface {
     
     
 
 
     /**
-     * 
-     * @param int $p
+     *  
      */
     public function actionIndex() {  
         View::renderPhp('site/index', [ ]); 
     }
  
+    /**
+     * @proxy_exec \vsapp\proxy\filters\controller\JSONResult {"autoExit":true}     
+     * @proxy_exec \vsapp\proxy\filters\controller\RequestMethod {"types": ["POST", "GET"]}
+     * @proxy_exec \vsapp\proxy\filters\controller\Access
+     */
+    public function actionTest() {
+        return [1, 2, 3, 4, 5];
+    }
  
 
     /**

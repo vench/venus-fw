@@ -58,8 +58,9 @@ class Vendor implements AppContextInterface {
     /**
      * 
      * @param string $className
-     * @param boolean $newInstance
+     * @param boolean $newInstance default false
      * @return mixed
+     * @todo check implementsInterface by Event Trunk
      */
     public function get($className, $newInstance = false) {
         $name = $this->getClassNameAliases($className);
@@ -68,6 +69,7 @@ class Vendor implements AppContextInterface {
             $ref = $this->getReflection($name);
             $inst = $ref->newInstanceArgs();
             Trunk::f(new Event(Trunk::TYPE_INIT_OBJECT, $inst));
+            
             if ($ref->implementsInterface(__NAMESPACE__ . '\ApplyAppableInterface')) {
                 call_user_func_array([$inst, 'appInit'], [$this]);
             }
@@ -77,8 +79,8 @@ class Vendor implements AppContextInterface {
                     $inst->{$fieldName} = $this->get($className);
                 }
             }
-            if ($ref->implementsInterface(__NAMESPACE__ . '\ProxyAnnotationInterface')) {
-                $inst = ProxyAnnotation::createProxy($inst, $this); 
+            if ($ref->implementsInterface(__NAMESPACE__ . '\proxy\AnnotationInterface')) {
+                $inst = proxy\Annotation::createProxy($inst, $this); 
             }
             
             $this->context[$name] = $inst;

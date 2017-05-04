@@ -20,7 +20,3 @@ $app->setClassNameAliases('resource', 'R');
 
 $app->run();
 
-$app->get('log')->addMessage("Start");
-
-$m = $app->get('\test_\Model');
-$m->printName();

@@ -1,13 +1,13 @@
 <?php
  
 
-namespace vsapp;
+namespace vsapp\proxy;
 
 /**
  *
  * @author vench
  */
-interface ProxyAnnotationFilterInterface {
+interface AnnotationFilterInterface {
 
     /**
      * 

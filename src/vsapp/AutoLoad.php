@@ -33,8 +33,8 @@ class AutoLoad {
             
             $path = str_replace('\\', '/', $class);
             
-            foreach(self::$directoryes as $baseDir) {
-                $file = $baseDir . DIRECTORY_SEPARATOR . $path . '.php';
+            foreach(self::$directoryes as $baseDir) { 
+                $file = $baseDir . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR). '.php';
                 if(file_exists($file)) {
                     include $file;
                     break;
@@ -50,4 +50,4 @@ class AutoLoad {
     public static function addDirectory($directory) {
         array_push(self::$directoryes, $directory);
     }
-}
+}    

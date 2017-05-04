@@ -1,14 +1,14 @@
 <?php
  
 
-namespace vsapp;
+namespace vsapp\proxy;
 
 /**
  * Description of ProxyAnnotation
  *
  * @author vench
  */
-class ProxyAnnotation implements ProxyAnnotationInterface {
+class Annotation implements AnnotationInterface {
     
     
     const PROXY_EXEC = '@proxy_exec';
@@ -51,16 +51,18 @@ class ProxyAnnotation implements ProxyAnnotationInterface {
      * @throws \Exception
      */
     public function __call($name, $arguments) {
-        if(method_exists($this->object, $name)) { 
-            $this->execBefore($name, $arguments);
+        if(method_exists($this->object, $name)) {  
             
             try {
+                $this->execBefore($name, $arguments);
                 $result = call_user_func_array([$this->object, $name], $arguments);
+                $this->execAfter($name, $result);
             } catch (\Exception $e) {
                 $this->execException($name, $e);
+                throw  $e;
             }    
             
-            $this->execAfter($name, $result);
+            
             return $result; 
         }
         throw new \Exception("Method {$name} not found");
@@ -75,11 +77,11 @@ class ProxyAnnotation implements ProxyAnnotationInterface {
     private function execException($name, \Exception $e) {
         if(!isset($this->executionMap[$name])) {
             return;
-        }
+        } 
         foreach($this->executionMap[$name] as $execution) {
             if(is_callable($execution)) {
                 $execution($this->object, self::PROXY_EXCEPTION, $name, $e);
-            } else if($execution instanceof ProxyAnnotationFilterInterface) {
+            } else if($execution instanceof AnnotationFilterInterface) {
                 $execution->execException($this->object, $name, $e);
             }
         }
@@ -99,7 +101,7 @@ class ProxyAnnotation implements ProxyAnnotationInterface {
         foreach($this->executionMap[$name] as $execution) {
             if(is_callable($execution)) {
                 $execution($this->object, self::PROXY_BEFORE, $name, $arguments);
-            } else if($execution instanceof ProxyAnnotationFilterInterface) {
+            } else if($execution instanceof AnnotationFilterInterface) {
                 $execution->execBefore($this->object, $name, $arguments);
             }
         }
@@ -117,7 +119,7 @@ class ProxyAnnotation implements ProxyAnnotationInterface {
         foreach($this->executionMap[$name] as $execution) {
             if(is_callable($execution)) {
                 $execution($this->object, self::PROXY_AFTER, $name, $result);
-            } else if($execution instanceof ProxyAnnotationFilterInterface) {
+            } else if($execution instanceof AnnotationFilterInterface) {
                 $execution->execAfter($this->object, $name, $result);
             }
         }
@@ -129,26 +131,37 @@ class ProxyAnnotation implements ProxyAnnotationInterface {
      * 
      * @param object $object
      * @param \vsapp\Vendor $vendor
-     * @return \vsapp\ProxyAnnotation
+     * @return \vsapp\proxy\Annotation
      */
     public static function createProxy($object, $vendor) {
         $executionMap = [];
         $ref = $vendor->getReflection( get_class( $object ) );
-       
+        $pm = '/\*\s+'.self::PROXY_EXEC.'\s+(\S+)\s+(\{.*\}|)/i'; 
+        
         foreach($ref->getMethods( \ReflectionMethod::IS_PUBLIC ) as $method) {
             /* @var $method \ReflectionMethod */
             $doc = $method->getDocComment(); 
-            if(!empty($doc) && preg_match_all('/\*\s+'.self::PROXY_EXEC.'\s+(\S+)\s/i', $doc, $maths) && isset($maths[1])) {
-                foreach($maths[1] as $classname) {
-                    if(!isset($executionMap[$method->getShortName()])) {
+            
+            if(!empty($doc) && preg_match_all($pm, $doc, $maths) && isset($maths[1])) {
+                
+                foreach($maths[1] as $n => $classname) {
+                    if(!isset($executionMap[$method->getShortName()])) { 
                         $executionMap[$method->getShortName()] = [];
                     }
-                    $executionMap[$method->getShortName()][] = $vendor->get($classname);
+                   
+                    $inst = $vendor->get($classname, true);
+                    if(isset($maths[2][$n]) && ($jsonAssoc = json_decode($maths[2][$n], true))) {
+                         foreach($jsonAssoc as $field => $value) {
+                             $inst->{$field} = $value;
+                         }
+                             
+                    }
+                    $executionMap[$method->getShortName()][] = $inst;
                 }
             } 
         }
         
-        return new ProxyAnnotation($object, $executionMap);
+        return new Annotation($object, $executionMap);
         
     }
 }

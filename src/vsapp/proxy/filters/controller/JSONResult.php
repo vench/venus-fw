@@ -36,9 +36,13 @@ class JSONResult implements AnnotationFilterInterface {
         $this->render($result); 
     }
 
-    public function execBefore($object, $name, $arguments) {
-        
-    }
+    /**
+     * 
+     * @param object $object
+     * @param string $name
+     * @param array $arguments
+     */
+    public function execBefore($object, $name, &$arguments) { }
     
     /**
      * 

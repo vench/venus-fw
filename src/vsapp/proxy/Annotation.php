@@ -54,7 +54,7 @@ class Annotation implements AnnotationInterface {
         if(method_exists($this->object, $name)) {  
             
             try {
-                $this->execBefore($name, $arguments);
+                $this->execBefore($name,  $arguments);
                 $result = call_user_func_array([$this->object, $name], $arguments);
                 $this->execAfter($name, $result);
             } catch (\Exception $e) {
@@ -94,15 +94,15 @@ class Annotation implements AnnotationInterface {
      * @param array $arguments
      * @return type
      */
-    private function execBefore($name, $arguments) {
+    private function execBefore($name, &$arguments) {
         if(!isset($this->executionMap[$name])) {
             return;
         }
         foreach($this->executionMap[$name] as $execution) {
             if(is_callable($execution)) {
-                $execution($this->object, self::PROXY_BEFORE, $name, $arguments);
+                $execution($this->object, self::PROXY_BEFORE, $name,  $arguments);
             } else if($execution instanceof AnnotationFilterInterface) {
-                $execution->execBefore($this->object, $name, $arguments);
+                $execution->execBefore($this->object, $name,  $arguments);
             }
         }
     }

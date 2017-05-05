@@ -19,7 +19,7 @@ class Access implements \vsapp\proxy\AnnotationFilterInterface {
         
     }
 
-    public function execBefore($object, $name, $arguments) {
+    public function execBefore($object, $name, &$arguments) {
          $id = $this->makeId($object, $name);
          $this->checkAccess($id);
     }

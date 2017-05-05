@@ -28,7 +28,7 @@ class RequestMethod implements \vsapp\proxy\AnnotationFilterInterface {
      * @param type $arguments
      * @throws \Exception 
      */
-    public function execBefore($object, $name, $arguments) { 
+    public function execBefore($object, $name, &$arguments) { 
         
         if(empty($this->types)) {
             return;

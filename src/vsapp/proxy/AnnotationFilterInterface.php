@@ -15,7 +15,7 @@ interface AnnotationFilterInterface {
      * @param string $name
      * @param array $arguments
      */
-    function execBefore($object, $name, $arguments);
+    function execBefore($object, $name, &$arguments);
     
     /**
      * 

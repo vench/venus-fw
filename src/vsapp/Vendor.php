@@ -27,9 +27,12 @@ class Vendor implements AppContextInterface {
      * @var array 
      */
     private $mapClassNameAliases = [
-        'resource' => __NAMESPACE__ . '\Resource',
-        'config' => __NAMESPACE__ . '\AppConfig',
-        'log' => __NAMESPACE__ . '\log\Log'
+        'resource'  => __NAMESPACE__ . '\Resource',
+        'config'    => __NAMESPACE__ . '\AppConfig',
+        'log'       => __NAMESPACE__ . '\log\Log',
+        'session'   => __NAMESPACE__  . '\auth\Session',
+        'webClient' => __NAMESPACE__  . '\auth\WebClient',
+        'access'    => __NAMESPACE__  . '\auth\Access',
     ];
 
     /**

@@ -20,4 +20,11 @@ return [
     'controllerPaths'   => [
         'sale\controller'
     ],
+    
+    /**
+     * 
+     */
+    'accessMap' => [
+        'admin' => ['apicontroller.actioncalk'],
+    ],
 ]; 

@@ -14,31 +14,62 @@ class ApiController implements  \vsapp\proxy\AnnotationInterface  {
     
     /**
      * 
-     * 
+     * @proxy_exec \vsapp\proxy\filters\controller\JSONResult 
      */
     public function actionTest() {
-        var_dump(__METHOD__); 
+        return "test";
     }
     
+    
+    /**
+     * 
+     * @proxy_exec \vsapp\proxy\filters\controller\JSONResult 
+     */
+    public function actionAuth($name = null) {
+        
+       \vsapp\App::current()->get('webClient')->setIdentifier($name); 
+        
+       return [
+           'name'       => $name,
+           'success'    => 'OK',
+       ];
+    }
     
  
     
     /**
      * @proxy_exec \vsapp\proxy\filters\controller\JSONResult 
      * @proxy_exec \vsapp\proxy\filters\controller\JSONQuery 
-     * @proxy_exec \vsapp\proxy\filters\controller\RequestMethod {"types": ["POST"]}
+     * @proxy_exec \vsapp\proxy\filters\controller\Access
+     * @ proxy_exec \vsapp\proxy\filters\controller\RequestMethod {"types": ["POST"]}
      */
-    public function actionCalk($input = null) {
-        
- 
-       
-        
+    public function actionCalk($input = null) {  
         return [            
             'input' => $input,
-            'r'     => mt_rand(0, 255),
+            'output'     => mt_rand(0, 255),
         ];
     }
     
-    
+    /**
+     * Factorialis 
+     * try /api/fac?n=4
+     * 
+     * @proxy_exec \vsapp\proxy\filters\controller\JSONResult 
+     * @proxy_exec \vsapp\proxy\filters\controller\RequestMethod {"types": ["GET"]}
+     */
+    public function actionFac($n) {
+        
+        $n = (int)$n;
+        
+        
+        $f  = function($v) use(&$f){
+            if($v <= 0) {
+                return 1;
+            } 
+            return $v -- * $f(  $v  );
+        };
+        
+        return ['input' => $n, 'output' => $f($n)];
+    }
      
 }

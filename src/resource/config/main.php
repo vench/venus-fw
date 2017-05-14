@@ -18,7 +18,7 @@ return [
      * 
      */
     'controllerPaths'   => [
-        'sale\controller'
+        //add patch to controllers
     ],
     
     /**

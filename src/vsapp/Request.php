@@ -49,6 +49,7 @@ class Request implements ApplyAppableInterface {
     public function getAction() { 
         $action = $this->get(self::ACTION_NAME);
         if(empty($action) && !empty($path = $this->server('PATH_INFO'))) {
+            //@todo math 
             $action = $path;
         } 
         return !is_null($action) ? $action : $this->getDefaultAction(); 

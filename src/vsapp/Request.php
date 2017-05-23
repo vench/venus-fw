@@ -22,6 +22,7 @@ class Request implements ApplyAppableInterface {
     private $defaultPage;
 
 
+    private $queryData = null;
 
 
     /**
@@ -30,8 +31,32 @@ class Request implements ApplyAppableInterface {
      * @return mixed
      */
     public function get($name) {
-        return filter_input(INPUT_GET, $name);
+        $query = $this->queryAll();
+        return isset($query[$name]) ? $query[$name] : null;
     }
+    
+    /**
+     * 
+     * @return mixed
+     */
+    public function queryAll() {
+        if(is_null($this->queryData)) {
+            $this->queryData = filter_input_array(INPUT_GET) ? : [];
+        }
+        return $this->queryData;
+    }
+    
+    
+    /**
+     * 
+     * @param array $queryData
+     */
+    public function addQueryData(array $queryData) {
+        if(is_array($queryData)) {
+            $this->queryData = array_merge($this->queryAll(),$queryData );
+        }
+    }
+    
     
     /**
      * Get value from POST params
@@ -50,7 +75,27 @@ class Request implements ApplyAppableInterface {
         $action = $this->get(self::ACTION_NAME);
         if(empty($action) && !empty($path = $this->server('PATH_INFO'))) {
             //@todo math 
+            
+            
+            $rv = new RequestVisitor($this);
+            $rv->path = $path;
+            
             $action = $path;
+            foreach ([
+               'user/all'    => ['method' => 'GET', 'path' => '/user',],
+               'user/one'    => ['method' => 'GET', 'path' => '/user/<id:\d+>',],
+               'user/add'    => ['method' => 'POST', 'path' => '/user',],
+               'user/update' => ['method' => 'PUT', 'path' => '/user/<id:\d+>',],
+               'user/delete' => ['method' => 'DELETE', 'path' => '/user/<id:\d+>',],
+            ] as $pathAction => $options) {
+                if($rv->check($options)) {
+                    $action = $pathAction;
+                    break;
+                } 
+            }
+            
+            
+            
         } 
         return !is_null($action) ? $action : $this->getDefaultAction(); 
     }
@@ -103,4 +148,89 @@ class Request implements ApplyAppableInterface {
         $this->defaultPage = $appConfig->getValue('defaultPage');
     }
 
+}
+
+
+
+class RequestVisitor {
+
+
+
+    
+    /**
+     *
+     * @var string 
+     */
+    public $path = null;
+    
+    /**
+     *
+     * @var string 
+     */
+    public $method;
+
+
+    /**
+     *
+     * @var Request
+     */
+    private $request;
+
+
+
+
+    public function __construct(Request $request) {
+        $this->request = $request;
+        $this->method = strtoupper( filter_input(INPUT_SERVER, 'REQUEST_METHOD') );
+    }
+
+
+
+
+    /**
+     * 
+     * @param array $params
+     * @return boolean
+     */
+    public function check( $params = []) { 
+        
+        
+        $mathQueryParams = null;
+        
+        foreach ($params as $name => $value) {
+            
+            
+            
+            if(isset($this->{$name}) && strcasecmp($this->{$name}, $value) !== 0) { 
+                $mathQueryParams = [];
+                $value = preg_replace_callback('/<(\S+)\:(.+)>/i', function($math) use(&$mathQueryParams) {                      
+                    if(isset($math[1])) {
+                        $mathQueryParams[$math[1]] = null;
+                    }
+                    return '(?<'.$math[1].'>'.$math[2].')'; }, 
+                    str_replace(['/'], ['\/'], $value));
+                $pattern = "/^{$value}$/i";
+                if($name == 'path' && preg_match($pattern, $this->{$name}, $math)) {
+                    
+                    if(!empty($mathQueryParams)) { 
+                        foreach($mathQueryParams as $key => $val) {
+                            if(isset($math[$key])) {
+                                $mathQueryParams[$key] = $math[$key];
+                            }
+                        } 
+                    }
+                    continue;
+                }
+                
+                return false;
+            }
+        }
+        
+       
+        if(!empty($mathQueryParams)) {
+            $this->request->addQueryData($mathQueryParams);
+        }
+        
+        return true;
+    }
 }

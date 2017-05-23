@@ -6,4 +6,4 @@ composer require vench/venus-fw
 
 
 --
-Example REST /tree/master/example/rest
+Example REST https://github.com/vench/venus-fw/tree/master/example/rest

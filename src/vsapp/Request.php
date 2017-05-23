@@ -22,7 +22,17 @@ class Request implements ApplyAppableInterface {
     private $defaultPage;
 
 
+    /**
+     *
+     * @var array
+     */
     private $queryData = null;
+    
+    /**
+     *
+     * @var array
+     */
+    private $routePathActions = [];
 
 
     /**
@@ -73,29 +83,18 @@ class Request implements ApplyAppableInterface {
      */
     public function getAction() { 
         $action = $this->get(self::ACTION_NAME);
-        if(empty($action) && !empty($path = $this->server('PATH_INFO'))) {
-            //@todo math 
-            
+        if(empty($action) && !empty($path = $this->server('PATH_INFO'))) { 
             
             $rv = new RequestVisitor($this);
             $rv->path = $path;
             
             $action = $path;
-            foreach ([
-               'user/all'    => ['method' => 'GET', 'path' => '/user',],
-               'user/one'    => ['method' => 'GET', 'path' => '/user/<id:\d+>',],
-               'user/add'    => ['method' => 'POST', 'path' => '/user',],
-               'user/update' => ['method' => 'PUT', 'path' => '/user/<id:\d+>',],
-               'user/delete' => ['method' => 'DELETE', 'path' => '/user/<id:\d+>',],
-            ] as $pathAction => $options) {
+            foreach ($this->routePathActions as $pathAction => $options) {
                 if($rv->check($options)) {
                     $action = $pathAction;
                     break;
                 } 
-            }
-            
-            
-            
+            }  
         } 
         return !is_null($action) ? $action : $this->getDefaultAction(); 
     }
@@ -146,6 +145,9 @@ class Request implements ApplyAppableInterface {
         /* @var $appConfig \app\AppConfig */
         $appConfig = $app->get('config'); 
         $this->defaultPage = $appConfig->getValue('defaultPage');
+        $this->routePathActions = $appConfig->getValue('routePathActions', []);
+        
+        
     }
 
 }

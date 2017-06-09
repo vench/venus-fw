@@ -135,33 +135,61 @@ class Annotation implements AnnotationInterface {
      */
     public static function createProxy($object, $vendor) {
         $executionMap = [];
-        $ref = $vendor->getReflection( get_class( $object ) );
-        $pm = '/\*\s+'.self::PROXY_EXEC.'\s+(\S+)\s+(\{.*\}|)/i'; 
+        $ref = $vendor->getReflection( get_class( $object ) ); 
+        
+        $configAll = self::parseDoc( $ref->getDocComment() ); 
+         
         
         foreach($ref->getMethods( \ReflectionMethod::IS_PUBLIC ) as $method) {
             /* @var $method \ReflectionMethod */
-            $doc = $method->getDocComment(); 
             
-            if(!empty($doc) && preg_match_all($pm, $doc, $maths) && isset($maths[1])) {
-                
-                foreach($maths[1] as $n => $classname) {
-                    if(!isset($executionMap[$method->getShortName()])) { 
-                        $executionMap[$method->getShortName()] = [];
-                    }
+            
+            
+            $config  = array_merge( self::parseDoc( $method->getDocComment() ), $configAll ); 
+            
+            if(!empty($config)) {
+                if(!isset($executionMap[$method->getShortName()])) { 
+                    $executionMap[$method->getShortName()] = [];
+                }
                    
+                foreach($config as $item) {
+                    list($classname, $paramsAssoc) = $item;
+                    
                     $inst = $vendor->get($classname, true);
-                    if(isset($maths[2][$n]) && ($jsonAssoc = json_decode($maths[2][$n], true))) {
-                         foreach($jsonAssoc as $field => $value) {
-                             $inst->{$field} = $value;
-                         }
-                             
+                    if(!empty($paramsAssoc)) {
+                        foreach($paramsAssoc as $field => $value) {
+                            $inst->{$field} = $value;
+                        }
                     }
                     $executionMap[$method->getShortName()][] = $inst;
                 }
-            } 
+            }  
         }
         
         return new Annotation($object, $executionMap);
         
+    }
+    
+    /**
+     * 
+     * @param string $doc
+     * @return array [ [ string class name, [ assoc array options ]], ]
+     */
+    private static function parseDoc($doc) {
+        $pm = '/\*\s+'.self::PROXY_EXEC.'\s+(\S+)\s+(\{.*\}|)/i'; 
+        $return = [];
+        
+        if(!empty($doc) && preg_match_all($pm, $doc, $maths) && isset($maths[1])) {
+           
+             foreach($maths[1] as $n => $classname) { 
+                    $jsonAssoc = null;
+                    if(isset($maths[2][$n])) {
+                          $jsonAssoc = json_decode($maths[2][$n], true); 
+                    }
+                    $return[] = [$classname, $jsonAssoc];
+                }
+        }
+        
+        return $return;
     }
 }

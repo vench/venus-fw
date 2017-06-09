@@ -11,6 +11,7 @@ use vsapp\proxy\AnnotationInterface;
  * Description of HomeController
  *
  * @author vench
+ * @proxy_exec \test_\NameClassEcho
  */
 class SiteController implements ApplyAppableInterface, AnnotationInterface {
     

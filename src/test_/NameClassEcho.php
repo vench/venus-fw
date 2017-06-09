@@ -15,7 +15,7 @@ class NameClassEcho implements \vsapp\proxy\AnnotationFilterInterface {
         echo __METHOD__, '::', get_class($object), '<br>';
     }
 
-    public function execBefore($object, $name, $arguments) {
+    public function execBefore($object, $name, &$arguments) {
         echo __METHOD__, '::', get_class($object), '<br>';
     }
 
